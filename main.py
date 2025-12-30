@@ -1,4 +1,6 @@
 import pygame
+from pygame.examples.sprite_texture import group
+
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from logger import log_state
 from player import Player
@@ -12,9 +14,14 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     pyclock = pygame.time.Clock()
-    dt = 0
+
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+    Player.containers = (updatable, drawable)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
+    dt = 0
 
     while True:
         log_state()
@@ -24,8 +31,12 @@ def main():
                 return
 
         screen.fill("black")
-        player.update(dt)
-        player.draw(screen)
+
+        updatable.update(dt)
+
+        for dr in drawable:
+            dr.draw(screen)
+
         pygame.display.flip()
         dt = pyclock.tick(60) / 1000
 
