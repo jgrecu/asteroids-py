@@ -1,9 +1,13 @@
-import pygame
-from pygame.examples.sprite_texture import group
+import sys
 
+import pygame
+
+from asteroid import Asteroid
+from asteroidfield import AsteroidField
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from logger import log_state
 from player import Player
+from logger import log_event
 
 
 def main():
@@ -15,11 +19,15 @@ def main():
 
     pyclock = pygame.time.Clock()
 
+    asteroids = pygame.sprite.Group()
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     Player.containers = (updatable, drawable)
+    Asteroid.containers = (asteroids, updatable, drawable)
+    AsteroidField.containers = (updatable, )
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    asteroidField = AsteroidField()
 
     dt = 0
 
@@ -33,6 +41,12 @@ def main():
         screen.fill("black")
 
         updatable.update(dt)
+
+        for astr in asteroids:
+            if astr.collides_with(player):
+                log_event("player_hit")
+                print("Game over!")
+                sys.exit()
 
         for dr in drawable:
             dr.draw(screen)
